@@ -1,2 +1,4 @@
-.idea
+﻿.idea
 venv
+*rpy*
+__py*
