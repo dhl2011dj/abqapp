@@ -2,3 +2,9 @@
 venv
 *rpy*
 __py*
+verify
+verifyOLD
+*.cae
+*.jnl
+*.msg
+*.rec
