@@ -8,3 +8,10 @@ verifyOLD
 *.jnl
 *.msg
 *.rec
+*.com
+*.dat
+*.inp
+*.odb
+*.prt
+*.sim
+*.sta

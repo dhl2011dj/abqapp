@@ -1,10 +1,23 @@
-from abaqus import *
+"""
+Compression Model
+=================
+
+A simple example to establish a compression model.
+
+.. figure:: /images/model.png
+    :width: 50%
+    :align: center
+
+    A simple compression model.
+"""
+
 from abaqus import *
 from abaqusConstants import *
 from caeModules import *
 from driverUtils import *
 
 executeOnCaeStartup()
+
 # Model
 model = mdb.models["Model-1"]
 
@@ -26,7 +39,7 @@ model.rootAssembly.Instance(name="instance", part=part, dependent=ON)
 
 # Material
 material = model.Material(name="material")
-material.Elastic(table=((2.0e11, 0.2),))
+material.Elastic(table=((1000, 0.2),))
 material.Density(table=((2500,),))
 
 # Section
@@ -39,10 +52,9 @@ step = model.StaticStep(
     previous="Initial",
     description="",
     timePeriod=1.0,
-    nlgeom=TRUE,
     timeIncrementationMethod=AUTOMATIC,
     maxNumInc=100,
-    initialInc=0.1,
+    initialInc=0.01,
     minInc=0.001,
     maxInc=0.1,
 )
@@ -52,7 +64,9 @@ field = model.FieldOutputRequest("F-Output-1", createStepName="Step-1", variable
 
 # Boundary condition
 bottom_instance = model.rootAssembly.instances["instance"].sets["set-bottom"]
-bc = model.DisplacementBC(name="BC-1", createStepName="Initial", region=bottom_instance, u3=SET)
+bc = model.DisplacementBC(
+    name="BC-1", createStepName="Initial", region=bottom_instance, u1=SET, u2=SET, u3=SET, ur1=SET, ur2=SET, ur3=SET
+)
 
 # Load
 top_instance = model.rootAssembly.instances["instance"].surfaces["surface-top"]
@@ -62,7 +76,7 @@ pressure = model.Pressure("pressure", createStepName="Step-1", region=top_instan
 elem1 = mesh.ElemType(elemCode=C3D8R)
 elem2 = mesh.ElemType(elemCode=C3D6)
 elem3 = mesh.ElemType(elemCode=C3D4)
-part.setElementType(regions=(part.cells,), elemTypes=(elem1,))
+part.setElementType(regions=(part.cells,), elemTypes=(elem1, elem2, elem3))
 part.seedPart(size=0.1)
 part.generateMesh()
 
@@ -75,4 +89,4 @@ job.submit()
 job.waitForCompletion()
 
 # Save abaqus model
-mdb.saveAs('compression.cae')
+mdb.saveAs("compression.cae")
